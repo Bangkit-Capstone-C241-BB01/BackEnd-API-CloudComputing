@@ -1,39 +1,36 @@
 const jwt = require('jsonwebtoken');
-const dotenv = require('dotenv');
-dotenv.config();
+require('dotenv').config();
 
-const generateToken = (user) => {
-    return jwt.sign(
-        { user }, 
-        process.env.JWT_SECRET_KEY, 
-        { expiresIn: '7d' }
-    );
+const generateToken = (data) => {
+  const token = jwt.sign(data, process.env.JWT_SECRET_KEY, {
+    expiresIn: '7d',
+  });
+  return token;
 };
 
-const authenticateToken = (req, res, next) => {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
+const authenticateToken = async (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  const token = authHeader && authHeader.split(' ')[1];
+  
+  if (token == null) return res.status(401).json({ msg: 'There is no token, please authenticate' });
 
-    if (!token) return res.status(401).json({ msg: 'You do not have a token' });
-
-    jwt.verify(token, process.env.JWT_SECRET_KEY, (err, decoded) => {
-        if (err) return res.sendStatus(403);
-        req.user = decoded.user;
-        next();
-    });
-};
-
-const authorizeRole = (roles) => {
-    return (req, res, next) => {
-        if (!roles.includes(req.user.role)) {
-            return res.sendStatus(403);
+  return jwt.verify(token, process.env.JWT_SECRET_KEY, (err, user) => {
+    if (err) {
+        if (err.name === 'TokenExpiredError') {
+          return res.status(401).json({ msg: 'Token expired' });
+        } else if (err.name === 'JsonWebTokenError') {
+          return res.status(401).json({ msg: 'Invalid token' });
+        } else {
+          return res.status(500).json({ msg: 'Internal server error' });
         }
-        next();
-    };
+      }
+
+    req.user = user;
+    next();
+  });
 };
 
 module.exports = {
     generateToken,
-    authenticateToken,
-    authorizeRole
-};
+    authenticateToken
+}
