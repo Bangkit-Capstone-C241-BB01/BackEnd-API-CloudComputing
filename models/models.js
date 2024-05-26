@@ -39,7 +39,7 @@ function initModels(sequelize) {
         foreignKey: 'store_id',
     });
 
-    return{ user, admin, customer, seller, store, product};
+    return{ user, admin, customer, seller, store, product };
 };
 
 module.exports.initModels = initModels;
