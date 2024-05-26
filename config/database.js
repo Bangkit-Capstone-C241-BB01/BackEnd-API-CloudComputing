@@ -13,4 +13,8 @@ const sequelize = new Sequelize(
 
 initModels(sequelize);
 
+// Create table using Sequelize
+// sequelize.sync({ force: true });
+// console.log("All models were synchronized successfully.");
+
 module.exports = sequelize;
