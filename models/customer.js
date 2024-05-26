@@ -1,46 +1,40 @@
-const User = require('./user');
-
 module.exports = (sequelize, DataTypes) => {
-    const Customer = sequelize.define('Customer', {
-        user_id: {
-            type: DataTypes.INTEGER,
-            primaryKey: true,
-            references: {
-                model: User,
-                key: 'user_id',
+    const customer = sequelize.define(
+        'customer', 
+        {
+            customer_id: {
+                type: DataTypes.INTEGER,
+                primaryKey: true,
+                autoIncrement: true,
             },
+            customer_phone: {
+                type: DataTypes.STRING,
+                allowNull: true,
+            },
+            customer_address: {
+                type: DataTypes.STRING,
+                allowNull: true,
+            },
+            customer_img: {
+                type: DataTypes.STRING,
+                allowNull: true,
+            },
+            user_id: {
+                type: DataTypes.INTEGER,
+                allowNull: false, //reference from user table
+            },
+        }, 
+        {
+            sequelize,
+            tableName: 'customer',
+            timestamps: true,
+            createdAt: 'created_at',
+            updatedAt: 'updated_at',
+            freezeTableName: true,
         },
-        username: {
-            type: DataTypes.STRING,
-            allowNull: false,
-            unique: true,
-        },
-        email: {
-            type: DataTypes.STRING,
-            allowNull: false,
-        },
-        password: {
-            type: DataTypes.STRING,
-            allowNull: false,
-        },
-        phone_number: {
-            type: DataTypes.STRING,
-        },
-        home_address: {
-        type: DataTypes.STRING,
-        },
-        avatar_image: {
-            type: DataTypes.STRING,
-        },
-        }, {
-        tableName: 'customer',
-        timestamps: true,
-        createdAt: 'created_at',
-        updatedAt: 'updated_at',
-    });
+    );
 
-    return Customer;
+    return customer;
 }
 
-// User.hasOne(Customer, { foreignKey: 'user_id' });
-// Customer.belongsTo(User, { foreignKey: 'user_id' });
+//ASSOCIATION: user hasMany customer, customer belongsTo customer - Foreign key: user_id

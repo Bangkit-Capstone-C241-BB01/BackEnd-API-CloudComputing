@@ -1,26 +1,45 @@
-const associateModels = (models) => {
-    const { User, Admin, Seller, Customer, Store, Product, Category } = models;
+const { DataTypes} = require('sequelize');
+const userTab = require('./user')
+const adminTab = require('./admin');
+const customerTab = require('./customer');
+const sellerTab = require('./seller');
+const storeTab = require('./store');
+const productTab = require('./product');
 
-    User.hasOne(Admin, { foreignKey: 'user_id' });
-    Admin.belongsTo(User, { foreignKey: 'user_id' });
+function initModels(sequelize) {
+    const user = userTab(sequelize, DataTypes);
+    const admin = adminTab(sequelize, DataTypes);
+    const customer = customerTab(sequelize, DataTypes);
+    const seller = sellerTab(sequelize, DataTypes);
+    const store = storeTab(sequelize, DataTypes);
+    const product = productTab(sequelize, DataTypes);
+    
+    user.hasMany(admin);
+    admin.belongsTo(user, {
+        foreignKey: 'user_id',
+    });
 
-    User.hasOne(Seller, { foreignKey: 'user_id' });
-    Seller.belongsTo(User, { foreignKey: 'user_id' });
+    user.hasMany(seller);
+    seller.belongsTo(user, {
+        foreignKey: 'user_id',
+    });
 
-    User.hasOne(Customer, { foreignKey: 'user_id' });
-    Customer.belongsTo(User, { foreignKey: 'user_id' });
+    user.hasMany(customer);
+    customer.belongsTo(user, {
+        foreignKey: 'user_id',
+    });
 
-    Seller.hasOne(Store, { foreignKey: 'seller_id' });
-    Store.belongsTo(Seller, { foreignKey: 'seller_id' });
+    seller.hasOne(store);
+    store.belongsTo(seller, {
+        foreignKey: 'seller_id',
+    });
 
-    Seller.hasMany(Product, { foreignKey: 'seller_id' });
-    Product.belongsTo(Seller, { foreignKey: 'seller_id' });
+    store.hasMany(product);
+    product.belongsTo(store, {
+        foreignKey: 'store_id',
+    });
 
-    Store.hasMany(Product, { foreignKey: 'store_id' });
-    Product.belongsTo(Store, { foreignKey: 'store_id' });
-
-    Category.hasMany(Product, { foreignKey: 'category_id' });
-    Product.belongsTo(Category, { foreignKey: 'category_id' });
+    return{ user, admin, customer, seller, store, product};
 };
 
-module.exports = associateModels;
+module.exports.initModels = initModels;

@@ -1,35 +1,28 @@
-const User = require('./user');
-
 module.exports = (sequelize, DataTypes) => {
-    const Admin = sequelize.define('Admin', {
-        user_id: {
-            type: DataTypes.INTEGER,
-            primaryKey: true,
-            references: {
-                model: User,
-                key: 'user_id',
+    const admin = sequelize.define(
+        'admin', 
+        {
+            admin_id: {
+                type: DataTypes.INTEGER,
+                primaryKey: true,
+                autoIncrement: true,
             },
+            user_id: {
+                type: DataTypes.INTEGER,
+                allowNull: false, //reference from user table
+            },
+        }, 
+        {
+            sequelize,
+            tableName: 'admin',
+            timestamps: true,
+            createdAt: 'created_at',
+            updatedAt: 'updated_at',
+            freezeTableName: true,
         },
-        username: {
-            type: DataTypes.STRING,
-            allowNull: false,
-            unique: true,
-        },
-        email: {
-            type: DataTypes.STRING,
-            allowNull: false,
-        },
-        password: {
-            type: DataTypes.STRING,
-            allowNull: false,
-        },
-        }, {
-        tableName: 'admin',
-        timestamps: false,
-    });
+    );
 
-    return Admin;
+    return admin;
 }
 
-// User.hasOne(Admin, { foreignKey: 'user_id' });
-// Admin.belongsTo(User, { foreignKey: 'user_id' });
+//ASSOCIATION: user hasMany admin, admin belongsTo user (One to Many) - Foreign key: user_id

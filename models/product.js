@@ -1,67 +1,64 @@
-const Seller = require('./seller');
-const Category = require('./category');
-
-
 module.exports = (sequelize, DataTypes) => {
-    const Product = sequelize.define('Product', {
-        product_id: {
-            type: DataTypes.INTEGER,
-            autoIncrement: true,
-            primaryKey: true,
-        },
-        product_name: {
-            type: DataTypes.STRING,
-            allowNull: false,
-        },
-        product_image: {
-            type: DataTypes.STRING,
-        },
-        price: {
-            type: DataTypes.DECIMAL(10, 2),
-            allowNull: false,
-        },
-        specification: {
-            type: DataTypes.TEXT,
-        },
-        description: {
-            type: DataTypes.TEXT,
-        },
-        stock: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-        },
-        rating: {
-            type: DataTypes.DECIMAL(3, 2),
-        },
-        seller_id: {
-            type: DataTypes.INTEGER,
-            references: {
-            model: Seller,
-            key: 'user_id',
+    const product = sequelize.define(
+        'product', 
+        {
+            product_id: {
+                type: DataTypes.INTEGER,
+                autoIncrement: true,
+                primaryKey: true,
             },
-        },
-        category_id: {
-            type: DataTypes.INTEGER,
-            references: {
-                model: Category,
-                key: 'category_id',
+            product_name: {
+                type: DataTypes.STRING,
+                allowNull: false,
             },
+            product_img: {
+                type: DataTypes.STRING,
+                allowNull: false,
+            },
+            product_price: {
+                type: DataTypes.DECIMAL(10, 3),
+                allowNull: false,
+            },
+            product_spec: {
+                type: DataTypes.TEXT,
+                allowNull: false,
+            },
+            product_desc: {
+                type: DataTypes.TEXT,
+                allowNull: false,
+            },
+            product_stock: {
+                type: DataTypes.INTEGER,
+                allowNull: false,
+            },
+            product_rate: {
+                type: DataTypes.DECIMAL(3, 2),
+                allowNull: false,
+            },
+            product_category: {
+                type: DataTypes.STRING,
+                allowNull: false,
+            },
+            img_quality: {
+                type: DataTypes.STRING,
+                allowNull: false,
+            },
+            store_id: {
+                type: DataTypes.INTEGER,
+                allowNull: false, //reference from store table
+            },
+        }, 
+        {
+            sequelize,
+            tableName: 'product',
+            timestamps: true,
+            createdAt: 'created_at',
+            updatedAt: 'updated_at',
+            freezeTableName: true,
         },
-        }, {
-        tableName: 'product',
-        timestamps: true,
-        createdAt: 'created_at',
-        updatedAt: 'updated_at',
-    });
+    );
 
-    return Product;
-}
+    return product;
+};
 
-// Seller.hasMany(Product, { foreignKey: 'seller_id' });
-// Product.belongsTo(Seller, { foreignKey: 'seller_id' });
-
-// Store.hasMany(Product, { foreignKey: 'store_id' });
-// Product.belongsTo(Store, { foreignKey: 'store_id' });
-
-// Category.hasMany(Product, { foreignKey: 'category_id' });
-// Product.belongsTo(Category, { foreignKey: 'category_id' });
+//ASSOCIATION: store hasMany product, product belongsTo store (one to many) - Foreign key: store_id
