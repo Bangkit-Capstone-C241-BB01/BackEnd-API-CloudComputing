@@ -1,5 +1,4 @@
 const bcrypt = require('bcryptjs');
-const db = require('../models/models');
 const { generateToken } = require('../middleware/middleware');
 
 const {
@@ -15,7 +14,7 @@ const userSignUp = async (req, res) => {
     const { user_name, user_email, user_password, user_role, store_name } = req.body;
 
     try {
-        // Check if user with the same email already exists
+        // Check if email already exists
         const userExist = await user.findOne({ where: { user_email } });
         if (userExist) {
             return res.status(400).json({ 
@@ -23,7 +22,7 @@ const userSignUp = async (req, res) => {
             });
         }
 
-        // Password validation
+        // Validate password
         if (!validatePassword(user_password)) {
             return res.status(400).json({ 
                 msg: 'Password must be at least 8 characters long' 
@@ -41,7 +40,7 @@ const userSignUp = async (req, res) => {
             user_role,
         });
 
-        // Generate token for user
+        // Generate token authentication
         const token = generateToken({ 
             user_id: newUser.user_id, 
             user_role: newUser.user_role 
@@ -108,7 +107,7 @@ const userLogin = async (req, res) => {
     const { user_email, user_password } =  req.body;
 
     try {
-        // Check if user with the provided email exists
+        // Check if the email exists
         const userExist = await user.findOne({ where: { user_email } });
         if (!userExist) {
             return res.status(400).json({ 
@@ -124,7 +123,7 @@ const userLogin = async (req, res) => {
             });
         }
 
-        // Generate token for user
+        // Generate token authentication
         const token = generateToken({ 
             user_id: userExist.user_id, 
             user_role: userExist.user_role 
