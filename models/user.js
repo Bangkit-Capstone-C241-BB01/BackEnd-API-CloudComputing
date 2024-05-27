@@ -20,10 +20,21 @@ module.exports = (sequelize, DataTypes) => {
           type: DataTypes.STRING,
           allowNull: false,
         },
+        user_phone: {
+          type: DataTypes.STRING,
+          allowNull: true,
+        },
+        user_address: {
+            type: DataTypes.STRING,
+            allowNull: true,
+        },
+        user_img: {
+          type: DataTypes.STRING,
+          allowNull: true,
+        },
         user_role: {
             type: DataTypes.ENUM('admin', 'seller', 'customer'),
             allowNull: false,
-            defaultValue: 'customer', //Default role is customer
         },
       },
       {

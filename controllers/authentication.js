@@ -3,15 +3,17 @@ const { generateToken } = require('../middleware/middleware');
 
 const {
     user,
-    admin,
-    customer,
-    seller,
-    store,
-    product
+    store
 } = require('../config/database').models;
 
 const userSignUp = async (req, res) => {
-    const { user_name, user_email, user_password, user_role, store_name } = req.body;
+    const { 
+        user_name, 
+        user_email, 
+        user_password, 
+        user_role, 
+        store_name 
+    } = req.body;
 
     try {
         // Check if email already exists
@@ -22,17 +24,15 @@ const userSignUp = async (req, res) => {
             });
         }
 
-        // Validate password
         if (!validatePassword(user_password)) {
             return res.status(400).json({ 
                 msg: 'Password must be at least 8 characters long' 
             });
         }
 
-        // Hash password
         const hashedPassword = await bcrypt.hash(user_password, 10);
 
-        // Create the user
+        // Create new user
         const newUser = await user.create({
             user_name,
             user_email,
@@ -46,47 +46,19 @@ const userSignUp = async (req, res) => {
             user_role: newUser.user_role 
         });
 
-        // If the user role is 'seller', create a store for them
         if (user_role === 'seller') {
             if (!store_name) {
                 return res.status(400).json({ msg: 'Store name is required for seller registration' });
             }
 
-            const newSeller = await seller.create({
-                user_id: newUser.user_id,
-            })
-
-            // Create the store
+            // Create new store
             const newStore = await store.create({
                 store_name,
+                user_id: newUser.user_id
             });
 
             return res.status(201).json({ 
-                msg: 'Seller user has created successfully', 
-                token 
-            });
-        }
-
-        // If the user role is 'customer', create a customer profile for them
-        if (user_role === 'customer') {
-            const newCustomer = await customer.create({
-                user_id: newUser.user_id,
-            });
-
-            return res.status(201).json({ msg: 
-                'Customer user has created successfully', 
-                token 
-            });
-        }
-
-        // If the user role is 'admin', create an admin profile for them
-        if (user_role === 'admin') {
-            const newAdmin = await admin.create({
-                user_id: newUser.user_id,
-            });
-
-            return res.status(201).json({ 
-                msg: 'User and admin profile created successfully', 
+                msg: 'User (Seller) has created successfully', 
                 token 
             });
         }
@@ -107,7 +79,6 @@ const userLogin = async (req, res) => {
     const { user_email, user_password } =  req.body;
 
     try {
-        // Check if the email exists
         const userExist = await user.findOne({ where: { user_email } });
         if (!userExist) {
             return res.status(400).json({ 
@@ -115,7 +86,6 @@ const userLogin = async (req, res) => {
             });
         }
 
-        // Check if the password is correct
         const passwordMatch = await bcrypt.compare(user_password, userExist.user_password);
         if (!passwordMatch) {
             return res.status(400).json({ 
@@ -123,13 +93,15 @@ const userLogin = async (req, res) => {
             });
         }
 
-        // Generate token authentication
         const token = generateToken({ 
             user_id: userExist.user_id, 
             user_role: userExist.user_role 
         });
 
-        return res.status(200).json({ token });
+        return res.status(200).json({ 
+            msg: 'User logged in sucessfully',
+            token 
+        });
     } catch (error) {
         console.error(error);
         return res.status(500).json({ 

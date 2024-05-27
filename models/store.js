@@ -42,4 +42,4 @@ module.exports = (sequelize, DataTypes) => {
     return store;
 };
 
-//ASSOCIATION: seller hasOne store, store belongs to seller (One to One) - Foreign key: seller_id
+//ASSOCIATION: user hasOne store, store belongs to user (One to One) - Foreign key: user_id
