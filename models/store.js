@@ -21,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
                 allowNull: true,
             },
             store_rate: {
-                type: DataTypes.DECIMAL(3, 2),
+                type: DataTypes.DECIMAL(2, 1),
                 allowNull: true,
             },
             store_location: {
