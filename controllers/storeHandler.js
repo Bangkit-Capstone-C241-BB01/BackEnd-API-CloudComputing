@@ -1,7 +1,6 @@
 const {
     user,
-    store,
-    product
+    store
 } = require('../config/database').models;
 
 const getSellerStore = async (req, res) => {
@@ -22,6 +21,7 @@ const getSellerStore = async (req, res) => {
             return res.status(404).json({ msg: 'Store not found' });
         }
 
+        
         const response = {
             store_id: storeAll.store_id,
             store_name: storeAll.store_name,
@@ -41,7 +41,38 @@ const getSellerStore = async (req, res) => {
 };
 
 const updateSellerStore = async (req, res) => {
+    try {
+        const sellerUserId = req.user.user_id;
+        const { store_name, store_img, store_desc, store_location } = req.body;
 
+        let store_rate = req.body.store_rate;
+
+        const sellerStore = await store.findOne({
+            where: { user_id: sellerUserId },
+        });
+
+        if (store_rate === undefined) {
+            store_rate = generateStoreRate();
+        }
+
+        if (!sellerStore) {
+            return res.status(404).json({ msg: 'Store not found' });
+        }
+
+        await sellerStore.update({
+            store_name,
+            store_img,
+            store_desc,
+            store_rate,
+            store_location
+        });
+
+        res.status(200).json({ msg: 'Store updated successfully', store: sellerStore });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ msg: 'Internal server error' });
+    }
 };
 
 const getAllStore = async (req, res) => {
@@ -53,6 +84,10 @@ const getAllStore = async (req, res) => {
                     model: user,
                     attributes: ['user_id', 'user_name']
                 }
+            ],
+            order: [
+                ['store_name', 'ASC'],
+                ['created_at', 'DESC']
             ]
         });
 
@@ -73,6 +108,11 @@ const getAllStore = async (req, res) => {
         console.error(error);
         res.status(500).json({ msg: 'Internal server error' });
     }
+};
+
+// Generates a random integer between 1 and 5
+const generateStoreRate = () => {
+    return Math.floor(Math.random() * 5) + 1;
 };
 
 module.exports = {

@@ -81,7 +81,10 @@ const updateProfile = async (req, res) => {
         const userProfileId = req.user.user_id;
         const { user_name, user_email, user_phone, user_address, user_img } = req.body;
 
-        const userExist = await user.findOne({ where: { user_id: userProfileId } });
+        const userExist = await user.findOne({ 
+            where: { user_id: userProfileId } 
+        });
+        
         if (!userExist) {
             return res.status(404).json({ msg: 'User not found' });
         }
@@ -105,42 +108,51 @@ const updateProfile = async (req, res) => {
 
         if (userUpdated.user_role === "seller") {
             const response = {
-                user_id: userUpdated.user_id,
-                user_name: userUpdated.user_name,
-                user_email: userUpdated.user_email,
-                user_role: userUpdated.user_role,
-                user_img: userUpdated.user_img,
-                store_id: userStore ? userStore.store_id : null,
-                store_name: userStore ? userStore.store_name : null,
-                created_at: userUpdated.created_at,
-                updated_at: userUpdated.updated_at
+                msg: "Your profile have been updated",
+                data: {
+                    user_id: userUpdated.user_id,
+                    user_name: userUpdated.user_name,
+                    user_email: userUpdated.user_email,
+                    user_role: userUpdated.user_role,
+                    user_img: userUpdated.user_img,
+                    store_id: userStore ? userStore.store_id : null,
+                    store_name: userStore ? userStore.store_name : null,
+                    created_at: userUpdated.created_at,
+                    updated_at: userUpdated.updated_at
+                }
             };
             res.status(200).json(response);
         };
 
         if (userUpdated.user_role === "customer") {
             const response = {
-                user_id: userUpdated.user_id,
-                user_name: userUpdated.user_name,
-                user_email: userUpdated.user_email,
-                user_role: userUpdated.user_role,
-                user_phone: userUpdated.user_phone,
-                user_address: userUpdated.user_address,
-                user_img: userUpdated.user_img,
-                created_at: userUpdated.created_at,
-                updated_at: userUpdated.updated_at
+                msg: "Your profile have been updated",
+                data: {
+                    user_id: userUpdated.user_id,
+                    user_name: userUpdated.user_name,
+                    user_email: userUpdated.user_email,
+                    user_role: userUpdated.user_role,
+                    user_phone: userUpdated.user_phone,
+                    user_address: userUpdated.user_address,
+                    user_img: userUpdated.user_img,
+                    created_at: userUpdated.created_at,
+                    updated_at: userUpdated.updated_at
+                }
             };
             res.status(200).json(response);
         };
 
         if (userUpdated.user_role === "admin") {
             const response = {
-                user_id: userUpdated.user_id,
-                user_name: userUpdated.user_name,
-                user_email: userUpdated.user_email,
-                user_role: userUpdated.user_role,
-                created_at: userUpdated.created_at,
-                updated_at: userUpdated.updated_at
+                msg: "Your profile have been updated",
+                data: {
+                    user_id: userUpdated.user_id,
+                    user_name: userUpdated.user_name,
+                    user_email: userUpdated.user_email,
+                    user_role: userUpdated.user_role,
+                    created_at: userUpdated.created_at,
+                    updated_at: userUpdated.updated_at
+                }
             };
             res.status(200).json(response);
         };

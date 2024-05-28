@@ -18,6 +18,10 @@ router.put('/profile', authenticateToken, updateProfile);
 router.get('/sellers/store', authenticateToken, getSellerStore);
 router.put('/sellers/store', authenticateToken, updateSellerStore);
 
-router.get('/stores', getAllStore);
+router.get('/stores', authenticateToken, getAllStore);
+
+router.post('/sellers/product', authenticateToken, );
+router.get('/products', authenticateToken, );
+
 
 module.exports = { router };
