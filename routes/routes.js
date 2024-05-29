@@ -5,6 +5,7 @@ const { authenticateToken } = require('../middleware/middleware');
 const { userSignUp, userLogin } = require('../controllers/authentication');
 const { getProfile, updateProfile } = require('../controllers/profile');
 const { getSellerStore, updateSellerStore, getAllStore } = require('../controllers/storeHandler');
+const { getProductStore, postNewProduct, getAllProduct, searchProductName } = require('../controllers/productHandler');
 
 const router = express.Router();
 
@@ -20,8 +21,9 @@ router.put('/sellers/store', authenticateToken, updateSellerStore);
 
 router.get('/stores', authenticateToken, getAllStore);
 
-router.post('/sellers/product', authenticateToken, );
-router.get('/products', authenticateToken, );
-
+router.post('/sellers/product', authenticateToken, postNewProduct);
+router.get('/sellers/product', authenticateToken, getProductStore);
+router.get('/products', authenticateToken, getAllProduct);
+router.post('/products', authenticateToken, searchProductName);
 
 module.exports = { router };

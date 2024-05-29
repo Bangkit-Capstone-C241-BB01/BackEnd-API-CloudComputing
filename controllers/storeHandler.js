@@ -43,7 +43,7 @@ const getSellerStore = async (req, res) => {
 const updateSellerStore = async (req, res) => {
     try {
         const sellerUserId = req.user.user_id;
-        const { store_name, store_img, store_desc, store_location } = req.body;
+        const { store_img, store_desc, store_location } = req.body;
 
         let store_rate = req.body.store_rate;
 
@@ -60,7 +60,6 @@ const updateSellerStore = async (req, res) => {
         }
 
         await sellerStore.update({
-            store_name,
             store_img,
             store_desc,
             store_rate,

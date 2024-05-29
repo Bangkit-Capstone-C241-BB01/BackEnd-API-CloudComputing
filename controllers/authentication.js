@@ -19,15 +19,11 @@ const userSignUp = async (req, res) => {
         // Check if email already exists
         const userExist = await user.findOne({ where: { user_email } });
         if (userExist) {
-            return res.status(400).json({ 
-                msg: 'This email is already exist' 
-            });
+            return res.status(400).json({ msg: 'This email is already exist' });
         }
 
         if (!validatePassword(user_password)) {
-            return res.status(400).json({ 
-                msg: 'Password must be at least 8 characters long' 
-            });
+            return res.status(400).json({ msg: 'Password must be at least 8 characters' });
         }
 
         const hashedPassword = await bcrypt.hash(user_password, 10);
@@ -69,9 +65,7 @@ const userSignUp = async (req, res) => {
         });
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ 
-            msg: 'Internal server error' 
-        });
+        return res.status(500).json({ msg: 'Internal server error' });
     }
 };
 
@@ -81,16 +75,12 @@ const userLogin = async (req, res) => {
     try {
         const userExist = await user.findOne({ where: { user_email } });
         if (!userExist) {
-            return res.status(400).json({ 
-                msg: 'Invalid email or password' 
-            });
+            return res.status(400).json({ msg: 'Invalid email or password' });
         }
 
         const passwordMatch = await bcrypt.compare(user_password, userExist.user_password);
         if (!passwordMatch) {
-            return res.status(400).json({ 
-                msg: 'Invalid email or password' 
-            });
+            return res.status(400).json({ msg: 'Invalid email or password' });
         }
 
         const token = generateToken({ 
@@ -104,9 +94,7 @@ const userLogin = async (req, res) => {
         });
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ 
-            msg: 'Internal server error' 
-        });
+        return res.status(500).json({ msg: 'Internal server error' });
     }
 };
 
