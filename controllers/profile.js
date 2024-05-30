@@ -2,6 +2,14 @@ const {
     user,
     store
 } = require('../config/database').models;
+const {Storage} = require('@google-cloud/storage');
+
+const storage = new Storage({
+    projectId: process.env.PROJECT_ID,
+    keyFilename: process.env.SERVICE_ACCOUNT_KEY,
+});
+
+const bucket = storage.bucket(process.env.BUCKET_PROFILE_NAME);
 
 const getProfile = async (req, res) => {
     try {
@@ -79,7 +87,7 @@ const getProfile = async (req, res) => {
 const updateProfile = async (req, res) => {
     try {
         const userProfileId = req.user.user_id;
-        const { user_name, user_email, user_phone, user_address, user_img } = req.body;
+        const { user_name, user_email, user_phone, user_address } = req.body;
 
         const userExist = await user.findOne({ 
             where: { user_id: userProfileId } 
@@ -89,12 +97,28 @@ const updateProfile = async (req, res) => {
             return res.status(404).json({ msg: 'User not found' });
         }
 
+        let user_img_url = userExist.user_img;
+
+        if (req.file) {
+            const blob = bucket.file(req.file.originalname.replace(/ /g, "_"));
+            const blobStream = blob.createWriteStream();
+
+            await new Promise((resolve, reject) => {
+                blobStream.on('error', error => reject(error));
+                blobStream.on('finish', () => {
+                    user_img_url = `https://storage.googleapis.com/${bucket.name}/${blob.name}`;
+                    resolve();
+                });
+                blobStream.end(req.file.buffer);
+            });
+        }
+
         await userExist.update({
             user_name: user_name || userExist.user_name, // Keep the existing value if not provided
             user_email: user_email || userExist.user_email,
             user_phone: user_phone || userExist.user_phone,
             user_address: user_address || userExist.user_address,
-            user_img: user_img || userExist.user_img
+            user_img: user_img_url
         });
 
         const userUpdated = await user.findOne({ 

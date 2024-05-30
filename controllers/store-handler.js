@@ -3,6 +3,15 @@ const {
     store
 } = require('../config/database').models;
 
+const {Storage} = require('@google-cloud/storage');
+
+const storage = new Storage({
+    projectId: process.env.PROJECT_ID,
+    keyFilename: process.env.SERVICE_ACCOUNT_KEY
+});
+
+const bucket = storage.bucket(process.env.BUCKET_STORE_NAME);
+
 const getSellerStore = async (req, res) => {
     try {
         const sellerUserId = req.user.user_id;
@@ -43,7 +52,7 @@ const getSellerStore = async (req, res) => {
 const updateSellerStore = async (req, res) => {
     try {
         const sellerUserId = req.user.user_id;
-        const { store_img, store_desc, store_location } = req.body;
+        const { store_desc, store_location } = req.body;
 
         let store_rate = req.body.store_rate;
 
@@ -59,8 +68,24 @@ const updateSellerStore = async (req, res) => {
             return res.status(404).json({ msg: 'Store not found' });
         }
 
+        let store_img_url;
+
+        if (req.file) {
+            const blob = bucket.file(req.file.originalname.replace(/ /g, "_"));
+            const blobStream = blob.createWriteStream();
+
+            await new Promise((resolve, reject) => {
+                blobStream.on('error', error => reject(error));
+                blobStream.on('finish', () => {
+                    store_img_url = `https://storage.googleapis.com/${bucket.name}/${blob.name}`;
+                    resolve();
+                });
+                blobStream.end(req.file.buffer);
+            });
+        }
+
         await sellerStore.update({
-            store_img,
+            store_img: store_img_url || sellerStore.store_img,
             store_desc,
             store_rate,
             store_location

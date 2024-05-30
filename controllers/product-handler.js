@@ -4,6 +4,14 @@ const {
     product
 } = require('../config/database').models;
 const { Op } = require('sequelize');
+const {Storage} = require('@google-cloud/storage');
+
+const storage = new Storage({
+    projectId: process.env.PROJECT_ID,
+    keyFilename: process.env.SERVICE_ACCOUNT_KEY
+});
+
+const bucket = storage.bucket(process.env.BUCKET_PRODUCT_NAME);
 
 const getProductStore = async (req, res) => {
     try {
@@ -46,13 +54,37 @@ const postNewProduct = async (req, res) => {
             return res.status(403).json({ msg: 'User does not have a store. Only store owners can post products.' });
         }
 
-        const { product_name, product_img, product_price, product_spec, product_desc, product_stock, product_category, img_quality } = req.body;
+        if (!req.file) {
+            return res.status(400).send({ msg: 'Image file is required.' });
+        }
+    
+        const { product_name, product_price, product_spec, product_desc, product_stock, product_category } = req.body;
+        
+        const blob = bucket.file(req.file.originalname.replace(/ /g, "_"));
+        const blobStream = blob.createWriteStream();
+    
+        let product_img_url;
+    
+        await new Promise((resolve, reject) => {
+            blobStream.on('error', error => reject(error));
+            blobStream.on('finish', () => {
+                product_img_url = `https://storage.googleapis.com/${bucket.name}/${blob.name}`;
+                resolve();
+            });
+            blobStream.end(req.file.buffer);
+        });
+    
+        const predictResponse = await axios.post('http://your-flask-server-url/predict', {
+            product_img: product_img_url
+        });
+
+        const { img_quality } = predictResponse.data;
 
         const product_rate = generateProductRate();
 
         const newProduct = await product.create({
             product_name,
-            product_img,
+            product_img: product_img_url,
             product_price,
             product_spec,
             product_desc,
@@ -73,6 +105,7 @@ const postNewProduct = async (req, res) => {
 const getAllProduct = async (req, res) => {
     try {
         const products = await product.findAll({
+            where: { img_quality: 'Normal' },
             include: {
                 model: store,
                 attributes: ['store_name', 'store_location']

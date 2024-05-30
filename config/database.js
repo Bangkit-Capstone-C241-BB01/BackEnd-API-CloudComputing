@@ -8,6 +8,9 @@ const sequelize = new Sequelize(
     {
         host: process.env.DB_CONNECTION_NAME,
         dialect: 'mysql',
+        // dialectOptions: {
+        //     socketPath: `/cloudsql/${process.env.DB_CONNECTION_NAME}`,
+        // },
     }
 );
 

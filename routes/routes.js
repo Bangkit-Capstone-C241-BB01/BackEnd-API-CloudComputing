@@ -1,5 +1,4 @@
 const express = require('express');
-const { multer } = require ('multer');
 const { authenticateToken } = require('../middleware/middleware');
 
 const { userSignUp, userLogin } = require('../controllers/authentication');
@@ -10,6 +9,9 @@ const { sortProductByRate, sortStoreByRate, sortProductByNewest, sortProductByLo
 const { dashboard, totals } = require('../controllers/admin-handler');
 const { getAppeal, postAppeal } = require('../controllers/appeal-handler');
 
+const multer = require ('multer');
+const upload = multer();
+
 const router = express.Router();
 
 //Authentication
@@ -18,15 +20,15 @@ router.post('/login', userLogin);
 
 //profile
 router.get('/profile', authenticateToken, getProfile);
-router.put('/profile', authenticateToken, updateProfile);
+router.put('/profile', authenticateToken, upload.single('img_user'), updateProfile);
 
 //store
 router.get('/sellers/store', authenticateToken, getSellerStore);
-router.put('/sellers/store', authenticateToken, updateSellerStore);
+router.put('/sellers/store', authenticateToken, upload.single('img_store'), updateSellerStore);
 router.get('/stores', authenticateToken, getAllStore);
 
 //product
-router.post('/sellers/product', authenticateToken, postNewProduct);
+router.post('/sellers/product', authenticateToken, upload.single('img_product'), postNewProduct);
 router.get('/sellers/product', authenticateToken, getProductStore);
 router.get('/products', authenticateToken, getAllProduct);
 router.post('/products', authenticateToken, searchProductName);
