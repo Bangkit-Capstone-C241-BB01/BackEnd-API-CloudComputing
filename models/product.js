@@ -43,6 +43,10 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.STRING,
                 allowNull: false,
             },
+            product_acceptance: {
+                type: DataTypes.BOOLEAN,
+                allowNull: false,
+            },
             store_id: {
                 type: DataTypes.INTEGER,
                 allowNull: false, //reference from store table

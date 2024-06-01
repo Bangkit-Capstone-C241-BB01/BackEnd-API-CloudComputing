@@ -75,10 +75,13 @@ const postNewProduct = async (req, res) => {
         });
     
         const predictResponse = await axios.post('http://your-flask-server-url/predict', {
-            product_img: product_img_url
+            image_url: product_img_url
         });
 
-        const { img_quality } = predictResponse.data;
+        const { 
+            accepted: product_acceptance, 
+            prediction_class: img_quality 
+        } = predictResponse.data.data;
 
         const product_rate = generateProductRate();
 
@@ -92,6 +95,7 @@ const postNewProduct = async (req, res) => {
             product_category,
             product_rate,
             img_quality,
+            product_acceptance,
             store_id: sellerStore.store_id
         });
 
