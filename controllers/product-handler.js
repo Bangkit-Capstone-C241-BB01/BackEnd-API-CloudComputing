@@ -1,3 +1,4 @@
+const axios = require("axios");
 const {
     user,
     store,
@@ -74,13 +75,13 @@ const postNewProduct = async (req, res) => {
             blobStream.end(req.file.buffer);
         });
     
-        const predictResponse = await axios.post('http://your-flask-server-url/predict', {
+        const predictResponse = await axios.post(process.env.ML_URL, {
             image_url: product_img_url
         });
 
         const { 
             accepted: product_acceptance, 
-            prediction_class: img_quality 
+            predicted_class: img_quality 
         } = predictResponse.data.data;
 
         const product_rate = generateProductRate();
