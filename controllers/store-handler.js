@@ -39,6 +39,8 @@ const getSellerStore = async (req, res) => {
             store_desc: storeAll.store_desc,
             store_rate: storeAll.store_rate,
             store_location: storeAll.store_location,
+            created_at: storeAll.created_at,
+            updated_at: storeAll.updated_at,
             user_id: sellerStore.user_id,
             user_name: sellerStore.user_name
         };
@@ -168,8 +170,9 @@ const getStoreById = async (req, res) => {
             store_location: storeDetails.store_location,
             created_at: storeDetails.created_at,
             updated_at: storeDetails.updated_at,
-            product: storeDetails.product,
-            seller: storeDetails.user
+            user_id: store.user ? store.user.user_id : null,
+            user_name: store.user ? store.user.user_name : null,
+            product: storeDetails.product
         };
 
         res.status(200).json(response);

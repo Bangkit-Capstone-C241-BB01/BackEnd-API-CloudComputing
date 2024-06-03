@@ -11,6 +11,10 @@ module.exports = (sequelize, DataTypes) => {
           type: DataTypes.TEXT,
           allowNull: false,
         },
+        is_admin_checked: {
+          type: DataTypes.BOOLEAN,
+          allowNull:true,
+        }
       },
       {
         sequelize,

@@ -1,7 +1,8 @@
 const {
     user,
     store,
-    product
+    product,
+    appeal
 } = require('../config/database').models;
 
 const dashboard = async (req, res) => {
@@ -59,11 +60,86 @@ const totals = async (req, res) => {
     }
 };
 
+const approveImgQuality = async (req, res) => {
+    try {
+        const { appeal_id } = req.body;
+        const user_id = req.user.user_id;
+
+        const currentUser = await user.findByPk(user_id);
+
+        if (!currentUser || currentUser.user_role !== 'admin') {
+            return res.status(403).json({ msg: 'Access denied. Admins only.' });
+        }
+
+        const appealUpdate = await appeal.findByPk(appeal_id, {
+            include: {
+                model: product
+            }
+        });
+
+        if (!appealUpdate) {
+            return res.status(404).json({ msg: 'Appeal not found' });
+        }
+
+        appealUpdate.product.img_quality = 'Normal';
+        await appealUpdate.product.save();
+
+        appealUpdate.is_admin_checked = true;
+        await appealUpdate.save();
+
+        res.status(200).json({ 
+            msg: 'Product image quality approved and appeal checked', 
+            appeal: appealUpdate 
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ msg: 'Internal server error' });
+    }
+};
+
+const rejectImgQuality = async (req, res) => {
+    try {
+        const { appeal_id } = req.body;
+        const user_id = req.user.user_id;
+
+        const currentUser = await user.findByPk(user_id);
+
+        if (!currentUser || currentUser.user_role !== 'admin') {
+            return res.status(403).json({ msg: 'Access denied. Admins only.' });
+        }
+
+        const appealDelete = await appeal.findByPk(appeal_id, {
+            include: {
+                model: product
+            }
+        });
+
+        if (!appealDelete) {
+            return res.status(404).json({ msg: 'Appeal not found' });
+        }
+
+        if (appealDelete.product) {
+            await appealDelete.product.destroy();
+        }
+
+        await appealDelete.destroy();
+
+        res.status(200).json({ 
+            msg: 'Image quality appeal rejected and product deleted' 
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ msg: 'Internal server error' });
+    }
+};
+
 const generatedTotalOrders = () => {
     return Math.floor(Math.random() * 50) + 1;
 };
 
 module.exports = {
     dashboard,
-    totals
+    totals,
+    approveImgQuality,
+    rejectImgQuality
 };

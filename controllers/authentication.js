@@ -15,11 +15,27 @@ const userSignUp = async (req, res) => {
         store_name 
     } = req.body;
 
+    console.log(req.body);
+
     try {
-        // Check if email already exists
-        const userExist = await user.findOne({ where: { user_email } });
-        if (userExist) {
-            return res.status(400).json({ msg: 'This email is already exist' });
+        if (!user_name || !user_email || !user_password || !user_role) {
+            return res.status(400).json({ msg: 'All fields cannot be empty' });
+        }
+
+        const userEmailExist = await user.findOne({ where: { 
+            user_email: req.body.user_email,
+        } });
+
+        const userNameExist = await user.findOne ({ where: {
+            user_name: req.body.user_name,
+        }});
+
+        if (userNameExist) {
+            return res.status(400).json({ msg: 'This username is already exist, please input a different usename' });
+        }
+
+        if (userEmailExist) {
+            return res.status(400).json({ msg: 'This email is already exist, please input a different email' });
         }
 
         if (!validatePassword(user_password)) {
@@ -73,14 +89,18 @@ const userLogin = async (req, res) => {
     const { user_email, user_password } =  req.body;
 
     try {
-        const userExist = await user.findOne({ where: { user_email } });
+        const userExist = await user.findOne({ 
+            where: { 
+                user_email: user_email,
+        }});
+
         if (!userExist) {
-            return res.status(400).json({ msg: 'Invalid email or password' });
+            return res.status(400).json({ msg: 'Invalid email' });
         }
 
         const passwordMatch = await bcrypt.compare(user_password, userExist.user_password);
         if (!passwordMatch) {
-            return res.status(400).json({ msg: 'Invalid email or password' });
+            return res.status(400).json({ msg: 'Invalid password' });
         }
 
         const token = generateToken({ 

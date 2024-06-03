@@ -4,6 +4,7 @@ const {
     product,
     appeal
 } = require('../config/database').models;
+const Sequelize = require('sequelize');
 
 const postAppeal = async (req, res) => {
     try {
@@ -72,7 +73,37 @@ const getAppeal = async (req, res) => {
     }
 };
 
+const getAppealBySellerId = async (req, res) => {
+    try {
+        const user_id = req.user.user_id;
+        
+        // Find appeals for products owned by the user
+        const appeals = await appeal.findAll({
+            include: {
+                model: product,
+                where: { 
+                    '$product.store_id$': { 
+                        [Sequelize.Op.ne]: null 
+                    } 
+                },
+                include: {
+                    model: store,
+                    where: { user_id: user_id },
+                    attributes: ['store_id', 'store_name']
+                },
+                attributes: ['product_id', 'product_name']
+            }
+        });
+
+        res.status(200).json(appeals);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ msg: 'Internal server error' });
+    }
+}
+
 module.exports = {
     postAppeal,
-    getAppeal
+    getAppeal,
+    getAppealBySellerId
 };

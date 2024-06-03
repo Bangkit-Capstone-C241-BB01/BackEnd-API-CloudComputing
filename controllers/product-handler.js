@@ -110,7 +110,7 @@ const postNewProduct = async (req, res) => {
 const getAllProduct = async (req, res) => {
     try {
         const products = await product.findAll({
-            where: { img_quality: 'Normal' },
+            where: { product_acceptance: true },
             include: {
                 model: store,
                 attributes: ['store_name', 'store_location']
@@ -128,6 +128,7 @@ const getAllProduct = async (req, res) => {
             product_rate: product.product_rate,
             product_category: product.product_category,
             img_quality: product.img_quality,
+            product_acceptance: product.product_acceptance,
             created_at: product.created_at,
             store_id: product.store_id,
             store_name: product.store ? product.store.store_name : null,
@@ -151,6 +152,7 @@ const searchProductName = async (req, res) => {
 
         const products = await product.findAll({
             where: {
+                product_acceptance: true,
                 product_name: {
                     [Op.like]: `%${product_name}%` // Case-insensitive search
                 }
@@ -161,21 +163,34 @@ const searchProductName = async (req, res) => {
             }
         });
 
-        const response = products.map(product => ({
-            product_id: product.product_id,
-            product_name: product.product_name,
-            product_img: product.product_img,
-            product_price: product.product_price,
-            product_spec: product.product_spec,
-            product_desc: product.product_desc,
-            product_stock: product.product_stock,
-            product_rate: product.product_rate,
-            product_category: product.product_category,
-            img_quality: product.img_quality,
-            store_id: product.store_id,
-            store_name: product.store ? product.store.store_name : null,
-            store_location: product.store ? product.store.store_location : null
-        }));
+        const totalResults = await product.count({
+            where: {
+                img_quality: 'Normal',
+                product_name: {
+                    [Op.like]: `%${product_name}%` // Case-insensitive search
+                }
+            }
+        });
+
+        const response = {
+            total_results: totalResults,
+            products: products.map(product => ({
+                product_id: product.product_id,
+                product_name: product.product_name,
+                product_img: product.product_img,
+                product_price: product.product_price,
+                product_spec: product.product_spec,
+                product_desc: product.product_desc,
+                product_stock: product.product_stock,
+                product_rate: product.product_rate,
+                product_category: product.product_category,
+                img_quality: product.img_quality,
+                product_acceptance: product.product_acceptance,
+                store_id: product.store_id,
+                store_name: product.store ? product.store.store_name : null,
+                store_location: product.store ? product.store.store_location : null
+            }))
+        };
 
         res.status(200).json(response);
     } catch (error) {
@@ -215,6 +230,7 @@ const getSellerProductById = async (req, res) => {
             product_rate: productDetails.product_rate,
             product_category: productDetails.product_category,
             img_quality: productDetails.img_quality,
+            product_acceptance: productDetails.product_acceptance,
             created_at: productDetails.created_at,
             updated_at: productDetails.updated_at,
             store_id: productDetails.store_id,
@@ -258,6 +274,7 @@ const getProductById = async (req, res) => {
             product_rate: productDetails.product_rate,
             product_category: productDetails.product_category,
             img_quality: productDetails.img_quality,
+            product_acceptance: productDetails.product_acceptance,
             created_at: productDetails.created_at,
             updated_at: productDetails.updated_at,
             store_id: productDetails.store_id,

@@ -7,6 +7,9 @@ const {
 const sortProductByRate = async (req, res) => {
     try {
         const products = await product.findAll({
+            where: {
+                product_acceptance: true
+            },
             include: {
                 model: store,
                 attributes: ['store_name', 'store_location']
@@ -25,6 +28,7 @@ const sortProductByRate = async (req, res) => {
             product_rate: product.product_rate,
             product_category: product.product_category,
             img_quality: product.img_quality,
+            product_acceptance: product.product_acceptance,
             store_name: product.store ? product.store.store_name : null,
             store_location: product.store ? product.store.store_location : null
         }));
@@ -66,6 +70,9 @@ const sortStoreByRate = async (req, res) => {
 const sortProductByNewest = async (req, res) => {
     try {
         const products = await product.findAll({
+            where: {
+                product_acceptance: true
+            },
             include: {
                 model: store,
                 attributes: ['store_name']
@@ -84,6 +91,7 @@ const sortProductByNewest = async (req, res) => {
             product_rate: product.product_rate,
             product_category: product.product_category,
             img_quality: product.img_quality,
+            product_acceptance: product.product_acceptance,
             store_id: product.store_id,
             store_name: product.store.store_name,
             created_at: product.created_at,
@@ -100,6 +108,9 @@ const sortProductByNewest = async (req, res) => {
 const sortProductByLocation = async (req, res) => {
     try {
         const products = await product.findAll({
+            where: {
+                product_acceptance: true
+            },
             include: {
                 model: store,
                 attributes: ['store_name', 'store_location']
@@ -118,6 +129,7 @@ const sortProductByLocation = async (req, res) => {
             product_rate: product.product_rate,
             product_category: product.product_category,
             img_quality: product.img_quality,
+            product_acceptance: product.product_acceptance,
             store_id: product.store_id,
             store_name: product.store.store_name,
             store_location: product.store.store_location,

@@ -6,8 +6,8 @@ const { getProfile, updateProfile } = require('../controllers/profile');
 const { getSellerStore, updateSellerStore, getAllStore, getStoreById } = require('../controllers/store-handler');
 const { getProductStore, postNewProduct, getAllProduct, searchProductName, getSellerProductById, getProductById } = require('../controllers/product-handler');
 const { sortProductByRate, sortStoreByRate, sortProductByNewest, sortProductByLocation } = require('../controllers/sort');
-const { dashboard, totals } = require('../controllers/admin-handler');
-const { getAppeal, postAppeal } = require('../controllers/appeal-handler');
+const { dashboard, totals, approveImgQuality, rejectImgQuality } = require('../controllers/admin-handler');
+const { getAppeal, postAppeal, getAppealBySellerId } = require('../controllers/appeal-handler');
 
 const multer = require ('multer');
 const upload = multer();
@@ -19,8 +19,8 @@ router.post('/register', userSignUp);
 router.post('/login', userLogin);
 
 //profile
-router.get('/profile', authenticateToken, getProfile);
-router.put('/profile', authenticateToken, upload.single('img_user'), updateProfile);
+router.get('/profiles', authenticateToken, getProfile);
+router.put('/profiles', authenticateToken, upload.single('img_user'), updateProfile);
 
 //store
 router.get('/sellers/store', authenticateToken, getSellerStore);
@@ -29,25 +29,30 @@ router.get('/stores', authenticateToken, getAllStore);
 router.get('/stores/:storeId', authenticateToken, getStoreById);
 
 //product
-router.post('/sellers/product', authenticateToken, upload.single('img_product'), postNewProduct);
-router.get('/sellers/product', authenticateToken, getProductStore);
+router.post('/sellers/products', authenticateToken, upload.single('img_product'), postNewProduct);
+router.get('/sellers/products', authenticateToken, getProductStore);
 router.get('/products', authenticateToken, getAllProduct);
 router.get('/sellers/products/:productId', authenticateToken, getSellerProductById);
 router.get('/products/:productId', authenticateToken, getProductById);
-router.post('/products', authenticateToken, searchProductName);
+router.post('/customers/products', authenticateToken, searchProductName);
 
 //sort
-router.get('/products/new', authenticateToken, sortProductByNewest);
-router.get('/products/rate', authenticateToken, sortProductByRate);
-router.get('/products/location', authenticateToken, sortProductByLocation);
-router.get('/stores/rate', authenticateToken, sortStoreByRate);
+router.get('/customers/products/news', authenticateToken, sortProductByNewest);
+router.get('/customers/products/rates', authenticateToken, sortProductByRate);
+router.get('/customers/products/locations', authenticateToken, sortProductByLocation);
+router.get('/customers/stores/rates', authenticateToken, sortStoreByRate);
 
 //admin dashboard
-router.get('/admin/dashboard', authenticateToken, dashboard);
-router.get('/admin/totals', authenticateToken, totals);
+router.get('/admins/dashboards', authenticateToken, dashboard);
+router.get('/admins/totals', authenticateToken, totals);
 
 //appeal
-router.get('/admin/appeal', authenticateToken, getAppeal);
-router.post('/sellers/appeal', authenticateToken, postAppeal);
+router.get('/admins/appeals', authenticateToken, getAppeal);
+router.post('/sellers/appeals', authenticateToken, postAppeal);
+router.get('/sellers/appeals', authenticateToken, getAppealBySellerId);
+
+//admin approval
+router.put('/admins/appeals/approves/', authenticateToken, approveImgQuality);
+router.delete('/admins/appeals/rejects/', authenticateToken, rejectImgQuality);
 
 module.exports = { router };
