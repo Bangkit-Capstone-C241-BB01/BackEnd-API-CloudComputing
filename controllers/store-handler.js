@@ -150,7 +150,7 @@ const getStoreById = async (req, res) => {
                 },
                 {
                     model: user,
-                    attributes: ['user_id', 'user_name', 'user_email', 'user_phone', 'user_address']
+                    attributes: ['user_id', 'user_name']
                 }
             ]
         });
