@@ -3,8 +3,8 @@ const { authenticateToken } = require('../middleware/middleware');
 
 const { userSignUp, userLogin } = require('../controllers/authentication');
 const { getProfile, updateProfile } = require('../controllers/profile');
-const { getSellerStore, updateSellerStore, getAllStore } = require('../controllers/store-handler');
-const { getProductStore, postNewProduct, getAllProduct, searchProductName } = require('../controllers/product-handler');
+const { getSellerStore, updateSellerStore, getAllStore, getStoreById } = require('../controllers/store-handler');
+const { getProductStore, postNewProduct, getAllProduct, searchProductName, getSellerProductById, getProductById } = require('../controllers/product-handler');
 const { sortProductByRate, sortStoreByRate, sortProductByNewest, sortProductByLocation } = require('../controllers/sort');
 const { dashboard, totals } = require('../controllers/admin-handler');
 const { getAppeal, postAppeal } = require('../controllers/appeal-handler');
@@ -26,11 +26,14 @@ router.put('/profile', authenticateToken, upload.single('img_user'), updateProfi
 router.get('/sellers/store', authenticateToken, getSellerStore);
 router.put('/sellers/store', authenticateToken, upload.single('img_store'), updateSellerStore);
 router.get('/stores', authenticateToken, getAllStore);
+router.get('/stores/:storeId', authenticateToken, getStoreById);
 
 //product
 router.post('/sellers/product', authenticateToken, upload.single('img_product'), postNewProduct);
 router.get('/sellers/product', authenticateToken, getProductStore);
 router.get('/products', authenticateToken, getAllProduct);
+router.get('/sellers/products/:productId', authenticateToken, getSellerProductById);
+router.get('/products/:productId', authenticateToken, getProductById);
 router.post('/products', authenticateToken, searchProductName);
 
 //sort

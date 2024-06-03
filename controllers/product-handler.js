@@ -184,6 +184,94 @@ const searchProductName = async (req, res) => {
     }
 };
 
+const getSellerProductById = async (req, res) => {
+    try {
+        const productId = req.params.productId;
+        const sellerUserId = req.user.user_id;
+
+        const productDetails = await product.findOne({
+            where: {
+                product_id: productId,
+            },
+            include: {
+                model: store,
+                where: { user_id: sellerUserId },
+                attributes: ['store_name', 'store_location']
+            }
+        });
+
+        if (!productDetails) {
+            return res.status(404).json({ msg: 'Product not found or you do not have permission to view this product' });
+        }
+
+        const response = {
+            product_id: productDetails.product_id,
+            product_name: productDetails.product_name,
+            product_img: productDetails.product_img,
+            product_price: productDetails.product_price,
+            product_spec: productDetails.product_spec,
+            product_desc: productDetails.product_desc,
+            product_stock: productDetails.product_stock,
+            product_rate: productDetails.product_rate,
+            product_category: productDetails.product_category,
+            img_quality: productDetails.img_quality,
+            created_at: productDetails.created_at,
+            updated_at: productDetails.updated_at,
+            store_id: productDetails.store_id,
+            store_name: productDetails.store.store_name,
+            store_location: productDetails.store.store_location
+        };
+
+        res.status(200).json(response);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ msg: 'Internal server error' });
+    }
+};
+
+const getProductById = async (req, res) => {
+    try {
+        const productId = req.params.productId;
+
+        const productDetails = await product.findOne({
+            where: {
+                product_id: productId,
+            },
+            include: {
+                model: store,
+                attributes: ['store_name', 'store_location']
+            }
+        });
+
+        if (!productDetails) {
+            return res.status(404).json({ msg: 'Product not found' });
+        }
+
+        const response = {
+            product_id: productDetails.product_id,
+            product_name: productDetails.product_name,
+            product_img: productDetails.product_img,
+            product_price: productDetails.product_price,
+            product_spec: productDetails.product_spec,
+            product_desc: productDetails.product_desc,
+            product_stock: productDetails.product_stock,
+            product_rate: productDetails.product_rate,
+            product_category: productDetails.product_category,
+            img_quality: productDetails.img_quality,
+            created_at: productDetails.created_at,
+            updated_at: productDetails.updated_at,
+            store_id: productDetails.store_id,
+            store_name: productDetails.store.store_name,
+            store_location: productDetails.store.store_location
+        };
+
+        res.status(200).json(response);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ msg: 'Internal server error' });
+    }
+};
+
 // Generates a random integer between 1 and 5
 const generateProductRate = () => {
     return Math.floor(Math.random() * 5) + 1;
@@ -193,5 +281,7 @@ module.exports = {
     getProductStore,
     postNewProduct,
     getAllProduct,
-    searchProductName
+    searchProductName,
+    getSellerProductById,
+    getProductById
 }
