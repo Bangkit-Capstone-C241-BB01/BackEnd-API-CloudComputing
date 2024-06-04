@@ -76,8 +76,6 @@ const getAppeal = async (req, res) => {
 const getAppealBySellerId = async (req, res) => {
     try {
         const user_id = req.user.user_id;
-        
-        // Find appeals for products owned by the user
         const appeals = await appeal.findAll({
             include: {
                 model: product,

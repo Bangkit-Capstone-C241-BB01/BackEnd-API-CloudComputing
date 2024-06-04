@@ -81,11 +81,14 @@ const approveImgQuality = async (req, res) => {
             return res.status(404).json({ msg: 'Appeal not found' });
         }
 
-        const { product } = appealUpdate;
-        product.product_acceptance = true;
-        product.img_quality = 'Normal';
-        await product.save();
-        
+        if (!appealUpdate.product) {
+            return res.status(404).json({ msg: 'Product not found in the appeal' });
+        }
+
+        appealUpdate.product.img_quality = 'Normal';
+        appealUpdate.product.product_acceptance = true;
+        await appealUpdate.product.save();
+
         appealUpdate.is_admin_checked = true;
         await appealUpdate.save();
 

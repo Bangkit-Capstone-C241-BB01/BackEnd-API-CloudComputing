@@ -109,7 +109,7 @@ const userLogin = async (req, res) => {
         });
 
         return res.status(200).json({ 
-            msg: 'User logged in sucessfully',
+            msg: 'User logged in successfully',
             token 
         });
     } catch (error) {
